@@ -4,10 +4,11 @@ That's right mbed with rust! The mbed library consist of 2 parts - mbed API (C++
 
 ### Current status
 
-It's still work in progress, as for example interrupts are not properly working, thus wait() function is commented out.
+It's work in progress.
 
 - mbed rust API in the separate module (DigitalOut will be there, not part of this app)
 - use cargo for everything (+ build script if required)
 - target definitions - to have a complete definition for K64F target, the PinNames or other enums/macros.
 - DigitalOut should be generic - currently gpio array is set to 4 (sizeof gpio_t for K64F), either to use dynamic allocation by mbed, or rust
-- to have multiple mbed targets supported 
+- to have multiple mbed targets supported
+- Makefile to build mbed library (only C code)
