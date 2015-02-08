@@ -16,9 +16,8 @@ CC      := arm-none-eabi-gcc
 AR      := arm-none-eabi-ar
 LD      := arm-none-eabi-ld
 RUSTC   := rustc
-RUSTPKG := rustpkg
 
-OPT  := 1 #There's a problem with optimization = 0
+OPT  := 0
 ARCH := thumbv7m
 CPU  := cortex-m4
 
@@ -27,12 +26,14 @@ OBJCPY = arm-none-eabi-objcopy
 RUSTFLAGS = -L . --target $(ARCH)-none-eabi -C target-cpu=$(CPU) 
 RUSTFLAGS += -C relocation-model=static
 RUSTFLAGS += -C opt-level=$(OPT) -g -Z no-landing-pads 
-# RUSTFLAGS += -A dead_code -A unused_variables 
+RUSTFLAGS += -A dead_code -A unused_variables 
 
-LDFLAGS  = -T K64FN1M0xxx12.ld
-LDFLAGS += -Map=frdm-k64f-mbed-blinky.map
-LDFLAGS += --gc-sections
-LDFLAGS += #-print-gc-sections
+LDFLAGS  = -mcpu=$(CPU) -mthumb -T K64FN1M0xxx12.ld
+LDFLAGS += -Wl,-Map=frdm-k64f-mbed-blinky.map,--cref -Wl,--wrap,main
+LDFLAGS += -Wl,--gc-sections --specs=nano.specs #-Wl,-print-gc-sections
+# LDFLAGS += -L /usr/lib/arm-none-eabi/newlib -L /usr/lib/arm-none-eabi/newlib/armv7-m #-print-gc-sections
+LDFLAGS += -L . src/mbed-rust-frdm-k64-blinky.o board.o cmsis_nvic.o mbed_overrides.o retarget.o startup_MK64F12.o system_MK64F12.o
+LDFLAGS += -Wl,--start-group -lmbed -lstdc++ -lsupc++ -lm -lc -lgcc -Wl,--end-group
 
 .SUFFIXES: .o .rs .c
 
@@ -42,7 +43,7 @@ all: frdm-k64f-mbed-blinky.elf frdm-k64f-mbed-blinky.bin print_info
 	$(RUSTC) $(RUSTFLAGS) --emit obj -o $@ $<
 
 frdm-k64f-mbed-blinky.elf: src/mbed-rust-frdm-k64-blinky.o 
-	$(LD) $(LDFLAGS) -L . src/mbed-rust-frdm-k64-blinky.o board.o cmsis_nvic.o mbed_overrides.o retarget.o startup_MK64F12.o system_MK64F12.o -lmbed -o $@
+	$(CC) $(LDFLAGS) /usr/lib/gcc/arm-none-eabi/4.8.4/libgcc.a -o $@
 
 frdm-k64f-mbed-blinky.bin: frdm-k64f-mbed-blinky.elf
 	$(OBJCPY) -O binary $< $@

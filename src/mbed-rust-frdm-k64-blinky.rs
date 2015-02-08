@@ -21,26 +21,6 @@
 
 extern crate core;
 
-#[no_mangle]
-pub fn _start() {
-    main();
-}
-
-#[no_mangle]
-pub fn __assert_func() {
-
-}
-
-#[no_mangle]
-pub fn fprintf() {
-
-}
-
-#[no_mangle]
-pub fn _impure_ptr() {
-
-}
-
 pub mod DigitalOut;
 
 #[link(name = "mbed", kind = "static")]
@@ -49,39 +29,17 @@ extern {
     pub fn mbed_die();
 }
 
-pub fn delay(mut cycles: u32) 
-{
-    while cycles > 0 {
-        unsafe {
-            asm!("nop" :::: "volatile");
-        }
-        cycles -= 1;
-    }
-}
-
 #[no_mangle]
 pub fn main() {
     let mut led = DigitalOut::DigitalOut::new((1 << 12) | 22);
-    loop {
-        led.write(1);
-        delay(5000000);
-        // wait(1.0);
-        led.write(0);
-        delay(5000000);
-        // wait(1.0);
+    unsafe {
+        loop {
+            led.write(1);
+            wait(1.0);
+            led.write(0);
+            wait(1.0);
+        }
     }
-}
-
-#[doc(hidden)]
-#[no_mangle]
-pub extern fn __aeabi_unwind_cpp_pr0() {
-    abort();
-}
-
-#[doc(hidden)]
-#[no_mangle]
-pub extern fn __aeabi_unwind_cpp_pr1() {
-    abort();
 }
 
 #[no_mangle]
