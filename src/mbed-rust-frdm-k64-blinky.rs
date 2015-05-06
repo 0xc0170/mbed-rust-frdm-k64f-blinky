@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![no_std]
 #![crate_type = "rlib"]
-#![feature(lang_items, asm)]
+#![feature(no_std)]
+#![no_std]
+#![feature(lang_items, asm, core)]
 
 #![allow(dead_code)]
 #![allow(non_snake_case)]
